@@ -1,0 +1,70 @@
+`{% extends 'base.html' %}
+{% block content %}
+
+<button class="add-btn" id="addBtn">Add Business</button>
+
+<div class="cards-wrapper">
+  {% for business in request.user.businesses.all %}
+    <div class="business-card">
+      <h3>{{ business.name }}</h3>
+      <p class="desc">{{ business.description }}</p>
+
+      <div class="meta">
+        <span>Created: {{ business.creation_date|date:"Y-m-d" }}</span>
+      </div>
+
+      <a href="{% url 'index-business' business.id %}" class="card-btn">
+        View Sales →
+      </a>
+    </div>
+  {% empty %}
+    <p class="empty">No businesses yet, add one.</p>
+  {% endfor %}
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="addModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal">
+      <i data-lucide="x"></i>
+    </button>
+
+    <h3>Add New Business</h3>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <input
+        type="text"
+        name="name"
+        placeholder="Business Name"
+        required
+      >
+
+      <textarea
+        name="description"
+        placeholder="Short description"
+        rows="3"
+        required
+      ></textarea>
+
+      <button type="submit" class="add-btn">Save</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  var modal = document.getElementById("addModal");
+  var addBtn = document.getElementById("addBtn");
+  var closeBtn = document.getElementById("closeModal");
+
+  addBtn.onclick = function () {
+    modal.style.display = "flex";
+  };
+
+  closeBtn.onclick = function () {
+    modal.style.display = "none";
+  };
+</script>
+
+{% endblock %}

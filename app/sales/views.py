@@ -1,17 +1,107 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Sale
-
+from .models import Sale, SaleGroup
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.messages import error
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Avg, Max, Min, Count
+from .models import SaleGroup, Sale
+from django.utils.dateparse import parse_date
 
-# Create your views here.
+
+@login_required
+def sales_report(request, id):
+    
+    business = get_object_or_404(
+        SaleGroup,
+        id=id,
+        owner=request.user
+    )
+
+    start_date = request.GET.get("start")
+    end_date = request.GET.get("end")
+
+    sales_qs = business.sales.all()
+
+    if start_date and end_date:
+        sales_qs = sales_qs.filter(
+            date__date__range=[start_date, end_date]
+        )
+
+    summary = sales_qs.aggregate(
+        gross_revenue=Sum("sale"),
+        total_expenses=Sum("expenses"),
+        total_profit=Sum("profit"),
+        avg_sale=Avg("sale"),
+        max_sale=Max("sale"),
+        min_sale=Min("sale"),
+        total_sales=Count("id"),
+    )
+
+    context = {
+        "business": business,
+        "summary": summary,
+        "start_date": start_date,
+        "end_date": end_date,
+    }
+
+    return render(request, "sales_report.html", context)
+
+
 
 def index(request):
-    sales = Sale.objects.all()
-    return render(request, "index.html", {"sales": sales})
+    if request.user.is_authenticated != True:
+            return redirect("login")
 
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+
+        if name and description:
+            SaleGroup.objects.create(
+                name=name,
+                description=description,
+                owner=request.user
+            )
+        
+
+        return redirect("index")  
+
+    return render(request, "groups.html")
+
+def index_business(request, id):
+
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    business = SaleGroup.objects.get(id=id)
+    sales = business.sales.all()
+
+    for s in sales :
+        s.refresh_profit();
+    
+    if request.method == "POST":
+        date = request.POST.get("date")
+        sale = request.POST.get("sale")
+        expenses = request.POST.get("expenses")
+        investment = request.POST.get("investment")
+
+        sale = Sale.objects.create(
+            business=business,
+            date=date,
+            sale=sale,
+            expenses=expenses,
+            investment=investment
+        )
+
+        sale.save();    
+        return redirect("index-business", id=id)
+
+    return render(request, "index_sales.html", {
+        "sales": sales,
+        "bid": id
+    })
 
 def front_logout(request):
     logout(request)
@@ -71,14 +161,14 @@ def onboard(request):
             new_user.set_password(conf_pass)
             new_user.save()
 
-            # Authenticate then login to ensure backend is set
             user = authenticate(request, username=username, password=conf_pass)
             if user:
                 login(request, user)
                 return redirect('index')
             else:
-                # fallback: if auth backend not found, try direct login
                 login(request, new_user)
                 return redirect('index')
 
     return render(request, "onboard.html")
+
+

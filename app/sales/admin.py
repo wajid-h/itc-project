@@ -1,6 +1,9 @@
 from django.contrib import admin
-from . import models
+from . models import SaleGroup
+from . models import Sale
+
 # Register your models here.
 
-admin.site.register(models.Sale)
+admin.site.register(Sale)
+admin.site.register(SaleGroup)
 

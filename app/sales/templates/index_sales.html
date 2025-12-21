@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<button class="add-btn" id="addBtn">Add New</button>
+    <button class="add-btn" id="reportBtn">Create Report</button>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Sale</th><th>Expenses</th><th>Profit</th></tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+      <tr>
+        <td>{{ sale.date }}     </td>
+        <td>{{ sale.sale }}     </td>
+        <td>{{ sale.expenses }} </td>
+        <td>{{ sale.profit }}   </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="modal" id="addModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal">
+      <i data-lucide="x"></i>
+    </button>
+    <h3>Add New Sale</h3>
+    <form method="POST"  >
+      {% csrf_token %}
+      <input type="date" placeholder="Date"  name="date">
+      <input type="number" placeholder="Sale" name="sale">
+      <input type="number" placeholder="Expenses" name="expenses">
+      <input type="investment" placeholder="Investment" name="investment">
+      
+      <button type="submit" class="add-btn">Save</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeReport">
+      <i data-lucide="x"></i>
+    </button>
+
+    <h3>Create Sales Report</h3>
+
+    <form method="GET"
+      action="{% url 'sales-report' bid %}">
+
+      <label>Start Date</label>
+      <input type="date" name="start" required>
+
+      <label>End Date</label>
+      <input type="date" name="end" required>
+
+      <button class="add-btn" type="submit">
+        Generate
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  var modal = document.getElementById("addModal");
+  var addBtn = document.getElementById("addBtn");
+  var closeBtn = document.getElementById("closeModal");
+
+  const reportBtn = document.getElementById("reportBtn");
+  const reportModal = document.getElementById("reportModal");
+  const closeReport = document.getElementById("closeReport");
+
+  reportBtn.onclick = () => reportModal.style.display = "flex";
+  closeReport.onclick = () => reportModal.style.display = "none";
+
+  addBtn.onclick = function () {
+    modal.style.display = "flex";
+  };
+
+  closeBtn.onclick = function () {
+    modal.style.display = "none";
+  };
+</script>
+{% endblock %}
