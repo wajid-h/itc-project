@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<button class="add-btn" id="addBtn">Add New</button>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Sale</th><th>Expenses</th><th>Profit</th></tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+      <tr><td>{{ sale.date }}</td><td>{{ sale.sale }}</td><td>{{ sale.expenses }}</td><td>{{ sale.profit }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="modal" id="addModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal"><i data-lucide="x"></i></button>
+    <h3>Add New Sale</h3>
+    <form>
+      <input type="date" placeholder="Date">
+      <input type="number" placeholder="Sale">
+      <input type="number" placeholder="Expenses">
+      <input type="number" placeholder="Profit">
+      <button type="submit" class="add-btn">Save</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
