@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProfitFlow - Track Sales, Know Profit, Instantly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #1a0f1a 0%, #2d1535 50%, #1a2540 100%);
+            color: #5a4a52;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 3D Cat Container */
+        #cat-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 200px;
+            height: 200px;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* SVG Animated Background */
+        #animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Animated particle background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 159, 178, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(255, 179, 217, 0.12) 0%, transparent 25%),
+                radial-gradient(circle at 40% 80%, rgba(192, 132, 252, 0.1) 0%, transparent 25%);
+            background-size: 200% 200%;
+            animation: particleShift 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes particleShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* Glassmorphic overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 179, 217, 0.08) 0%, rgba(255, 159, 178, 0.04) 50%, transparent 100%);
+            backdrop-filter: blur(50px);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Floating particle elements */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Sparkle particles */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .sparkle::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Main content */
+        section {
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Pink top layer */
+        .top-gradient-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(255, 159, 178, 0.3) 0%, rgba(255, 179, 217, 0.15) 50%, transparent 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 179, 217, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Hero - Fullscreen Bold */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 4rem 2rem;
+            gap: 4rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 250, 248, 0.05) 0%, rgba(255, 240, 245, 0.03) 50%, rgba(245, 249, 255, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 159, 178, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(192, 132, 252, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-text {
+            animation: slideInLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(3rem, 12vw, 6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+            word-spacing: 100vw;
+            background: linear-gradient(135deg, #ff9fb2 0%, #ffb3d9 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(139, 107, 120, 0.9);
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            max-width: 500px;
+            font-weight: 400;
+        }
+
+        .cta-primary {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, rgba(255, 159, 178, 0.9) 0%, rgba(255, 179, 217, 0.9) 100%);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(255, 159, 178, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+        }
+
+        .cta-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 179, 217, 0.95) 0%, rgba(192, 132, 252, 0.95) 100%);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(255, 159, 178, 0.35);
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cta-primary:hover::before {
+            left: 0;
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 500px;
+            animation: slideInRight 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 5;
+        }
+
+        .floating-box {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(255, 179, 217, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: rgba(255, 209, 220, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px rgba(255, 159, 178, 0.12);
+        }
+
+        .box-1 {
+            top: 0;
+            right: 0;
+            animation: float1 6s ease-in-out infinite;
+            border-color: rgba(255, 159, 178, 0.5);
+            background: rgba(255, 159, 178, 0.1);
+        }
+
+        .box-2 {
+            top: 150px;
+            left: 50px;
+            animation: float2 5s ease-in-out infinite;
+            border-color: rgba(255, 179, 217, 0.5);
+            background: rgba(255, 179, 217, 0.1);
+        }
+
+        .box-3 {
+            bottom: 0;
+            right: 100px;
+            animation: float3 7s ease-in-out infinite;
+            border-color: rgba(192, 132, 252, 0.5);
+            background: rgba(192, 132, 252, 0.1);
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(30px) rotate(-5deg); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(25px) rotate(-3deg); }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Statement Section */
+        .statement {
+            padding: 12rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 250, 248, 0.03) 0%, rgba(255, 240, 245, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 179, 217, 0.1);
+        }
+
+        .statement h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .statement .split-text {
+            display: inline;
+        }
+
+        .statement .highlight {
+            background: linear-gradient(135deg, #ff9fb2 0%, #ffb3d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            font-style: italic;
+        }
+
+        .statement p {
+            font-size: 1.2rem;
+            color: rgba(139, 107, 120, 0.85);
+            max-width: 700px;
+            margin: 2rem auto;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        /* Features - Timeline style */
+        .features {
+            padding: 8rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(255, 251, 240, 0.02) 0%, rgba(255, 245, 247, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 179, 217, 0.1);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 8rem;
+        }
+
+        .features-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .features-timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .features-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, rgba(255, 179, 217, 0.4) 0%, rgba(255, 179, 217, 0.05) 100%);
+            transform: translateX(-50%);
+        }
+
+        .feature-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+            align-items: center;
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
+
+        .feature-item:nth-child(1) { animation-delay: 0.1s; }
+        .feature-item:nth-child(2) { animation-delay: 0.2s; }
+        .feature-item:nth-child(3) { animation-delay: 0.3s; }
+
+        .feature-item:nth-child(even) {
+            direction: rtl;
+        }
+
+        .feature-item:nth-child(even) > * {
+            direction: ltr;
+        }
+
+        .feature-dot {
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, rgba(255, 159, 178, 0.95) 0%, rgba(255, 179, 217, 0.95) 100%);
+            border: 4px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            box-shadow: 0 6px 20px rgba(255, 159, 178, 0.25);
+        }
+
+        .feature-content h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .feature-content p {
+            color: rgba(139, 107, 120, 0.85);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            color: rgba(139, 107, 120, 0.8);
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .feature-list li::before {
+            content: '+';
+            position: absolute;
+            left: 0;
+            font-weight: 800;
+            color: #ff9fb2;
+        }
+
+        .feature-visual {
+            background: linear-gradient(135deg, rgba(255, 159, 178, 0.15) 0%, rgba(255, 179, 217, 0.15) 100%);
+            padding: 3rem;
+            border: 2px solid rgba(255, 179, 217, 0.35);
+            border-radius: 20px;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 35px rgba(255, 159, 178, 0.1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Who It's For */
+        .who-section {
+            padding: 10rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 240, 246, 0.02) 0%, rgba(255, 251, 240, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 179, 217, 0.1);
+        }
+
+        .who-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .who-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .who-header p {
+            font-size: 1.1rem;
+            color: rgba(139, 107, 120, 0.85);
+            font-weight: 400;
+        }
+
+        .who-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .who-card {
+            padding: 3rem 2rem;
+            background: rgba(255, 209, 220, 0.12);
+            border: 2px solid rgba(255, 179, 217, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out backwards;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 35px rgba(255, 159, 178, 0.08);
+        }
+
+        .who-card:nth-child(1) { animation-delay: 0.1s; }
+        .who-card:nth-child(2) { animation-delay: 0.2s; }
+        .who-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .who-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255, 159, 178, 0.8) 0%, rgba(255, 179, 217, 0.8) 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .who-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .who-card:hover {
+            border-color: rgba(255, 159, 178, 0.6);
+            transform: translateY(-10px);
+            background: rgba(255, 159, 178, 0.2);
+            box-shadow: 0 18px 45px rgba(255, 159, 178, 0.15);
+        }
+
+        .who-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .who-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .who-card p {
+            color: rgba(139, 107, 120, 0.85);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        /* Stats - Grid burst */
+        .stats {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 245, 247, 0.02) 0%, rgba(255, 240, 246, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 179, 217, 0.1);
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .stats-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 2.5rem;
+            background: rgba(255, 209, 220, 0.12);
+            border: 2px solid rgba(255, 179, 217, 0.3);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            animation: scaleIn 0.6s ease-out backwards;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 35px rgba(255, 159, 178, 0.08);
+        }
+
+        .stat:nth-child(1) { animation-delay: 0.05s; }
+        .stat:nth-child(2) { animation-delay: 0.1s; }
+        .stat:nth-child(3) { animation-delay: 0.15s; }
+        .stat:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stat:hover {
+            border-color: rgba(255, 159, 178, 0.6);
+            transform: translateY(-8px);
+            background: rgba(255, 159, 178, 0.2);
+            box-shadow: 0 18px 45px rgba(255, 159, 178, 0.15);
+        }
+
+        .stat-number {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ff9fb2 0%, #ffb3d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: rgba(139, 107, 120, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 10rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 235, 240, 0.03) 0%, rgba(255, 245, 247, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 179, 217, 0.1);
+        }
+
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 159, 178, 0.12) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            border-radius: 50%;
+            animation: drift 15s ease-in-out infinite;
+        }
+
+        .final-cta::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.08) 0%, transparent 70%);
+            bottom: -150px;
+            left: -150px;
+            border-radius: 50%;
+            animation: drift 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(40px, 40px); }
+        }
+
+        .final-cta-content {
+            position: relative;
+            z-index: 5;
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+            background: rgba(255, 209, 220, 0.12);
+            padding: 4rem 3rem;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 179, 217, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 45px rgba(255, 159, 178, 0.12);
+        }
+
+        .final-cta h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 209, 220, 0.95);
+        }
+
+        .final-cta p {
+            font-size: 1.2rem;
+            color: rgba(139, 107, 120, 0.85);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .features-timeline::before {
+                display: none;
+            }
+
+            .feature-item {
+                grid-template-columns: 1fr;
+                direction: ltr !important;
+            }
+
+            .feature-item > * {
+                direction: ltr !important;
+            }
+
+            .feature-dot {
+                display: none;
+            }
+
+            .who-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem 1rem;
+                min-height: auto;
+            }
+
+            .hero h1 {
+                margin-bottom: 1rem;
+            }
+
+            .hero-visual {
+                height: 300px;
+            }
+
+            .floating-box {
+                width: 120px;
+                height: 120px;
+                font-size: 2rem;
+                border-radius: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features,
+            .statement,
+            .who-section,
+            .stats,
+            .final-cta {
+                padding: 4rem 1rem;
+            }
+
+            .final-cta-content {
+                padding: 2.5rem 2rem;
+            }
+
+            #cat-container {
+                width: 150px;
+                height: 150px;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+        a{
+            text-decoration:  none;
+            color:  white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Cat Container -->
+    <div id="cat-container"></div>
+
+    <!-- Animated SVG Background -->
+    <svg id="animated-bg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+        <defs>
+            <style>
+                @keyframes float-circle-1 {
+                    0%, 100% { transform: translate(0, 0); }
+                    25% { transform: translate(40px, -30px); }
+                    50% { transform: translate(0, -60px); }
+                    75% { transform: translate(-40px, -30px); }
+                }
+                @keyframes float-circle-2 {
+                    0%, 100% { transform: translate(0, 0); }
+                    25% { transform: translate(-50px, 40px); }
+                    50% { transform: translate(-30px, 80px); }
+                    75% { transform: translate(30px, 50px); }
+                }
+                @keyframes float-circle-3 {
+                    0%, 100% { transform: translate(0, 0); }
+                    25% { transform: translate(35px, 25px); }
+                    50% { transform: translate(60px, -20px); }
+                    75% { transform: translate(40px, -50px); }
+                }
+                @keyframes float-circle-4 {
+                    0%, 100% { transform: translate(0, 0); }
+                    25% { transform: translate(-40px, -40px); }
+                    50% { transform: translate(-20px, 20px); }
+                    75% { transform: translate(30px, 30px); }
+                }
+                @keyframes float-circle-5 {
+                    0%, 100% { transform: translate(0, 0); }
+                    25% { transform: translate(50px, 30px); }
+                    50% { transform: translate(30px, -40px); }
+                    75% { transform: translate(-20px, -50px); }
+                }
+                
+                .bg-shape-1 {
+                    animation: float-circle-1 20s ease-in-out infinite;
+                }
+                .bg-shape-2 {
+                    animation: float-circle-2 22s ease-in-out infinite;
+                }
+                .bg-shape-3 {
+                    animation: float-circle-3 24s ease-in-out infinite;
+                }
+                .bg-shape-4 {
+                    animation: float-circle-4 26s ease-in-out infinite;
+                }
+                .bg-shape-5 {
+                    animation: float-circle-5 25s ease-in-out infinite;
+                }
+            </style>
+        </defs>
+        
+        <!-- Shape 1: Circle with gradient -->
+        <g class="bg-shape-1">
+            <circle cx="300" cy="200" r="150" fill="rgba(255, 159, 178, 0.08)" filter="url(#blur)"/>
+        </g>
+        
+        <!-- Shape 2: Rounded square -->
+        <g class="bg-shape-2">
+            <rect x="1400" y="100" width="200" height="200" rx="60" fill="rgba(255, 179, 217, 0.06)"/>
+        </g>
+        
+        <!-- Shape 3: Circle -->
+        <g class="bg-shape-3">
+            <circle cx="1650" cy="800" r="120" fill="rgba(192, 132, 252, 0.07)"/>
+        </g>
+        
+        <!-- Shape 4: Large circle -->
+        <g class="bg-shape-4">
+            <circle cx="200" cy="900" r="180" fill="rgba(255, 159, 178, 0.06)"/>
+        </g>
+        
+        <!-- Shape 5: Small rounded square -->
+        <g class="bg-shape-5">
+            <rect x="900" y="400" width="150" height="150" rx="45" fill="rgba(255, 179, 217, 0.07)"/>
+        </g>
+        
+        <!-- Blur filter for smooth edges -->
+        <filter id="blur">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
+        </filter>
+    </svg>
+
+    <!-- Pink Top Layer -->
+    <div class="top-gradient-layer"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Profit Made Simple</h1>
+            <p>See exactly where your money goes. Every transaction. Every cost. Real-time clarity for real business decisions.</p>
+            <button class="cta-primary" onclick="document.getElementById('features').scrollIntoView({ behavior: 'smooth' })">
+                Explore Now
+            </button>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-box box-1">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#ff9fb2" stroke-width="2">
+                    <rect x="15" y="20" width="50" height="35" rx="3"/>
+                    <line x1="25" y1="30" x2="55" y2="30"/>
+                    <line x1="25" y1="38" x2="55" y2="38"/>
+                    <line x1="25" y1="46" x2="40" y2="46"/>
+                    <circle cx="65" cy="50" r="8" fill="#ff9fb2"/>
+                </svg>
+            </div>
+            <div class="floating-box box-2">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#ffb3d9" stroke-width="2">
+                    <path d="M20 50 L40 25 L60 45 L50 60 Q40 70 30 60 Z" fill="rgba(255,179,217,0.2)"/>
+                    <circle cx="40" cy="35" r="3" fill="#ffb3d9"/>
+                    <circle cx="55" cy="50" r="3" fill="#ffb3d9"/>
+                </svg>
+            </div>
+            <div class="floating-box box-3">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#c084fc" stroke-width="2">
+                    <rect x="15" y="20" width="50" height="40" rx="3"/>
+                    <path d="M20 35 L40 25 L60 40"/>
+                    <circle cx="25" cy="55" r="4" fill="#c084fc"/>
+                    <circle cx="40" cy="55" r="4" fill="#c084fc"/>
+                    <circle cx="55" cy="55" r="4" fill="#c084fc"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statement Section -->
+    <section class="statement">
+        <h2>
+            <span class="split-text">Your business moves fast.</span>
+            <br>
+            <span class="highlight">Your profit should too.</span>
+        </h2>
+        <p>Stop wasting time on spreadsheets. Stop guessing. Our AI learns your patterns, predicts your future, and shows you what matters—instantly.</p>
+    </section>
+
+    <!-- Features Timeline -->
+    <section class="features" id="features">
+        <div class="features-header">
+            <h2>How It Works</h2>
+        </div>
+        <div class="features-timeline">
+            <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-content">
+                    <h3>Real-Time Intelligence</h3>
+                    <p>Connect your accounts. Watch as transactions flow in. Every sale. Every expense. Categorized instantly. No manual data entry hell.</p>
+                    <ul class="feature-list">
+                        <li>Auto-categorization</li>
+                        <li>Live profit tracking</li>
+                        <li>Instant insights</li>
+                    </ul>
+                </div>
+                <div class="feature-visual">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#ff9fb2" stroke-width="2">
+                        <rect x="25" y="15" width="30" height="50" rx="2"/>
+                        <circle cx="40" cy="30" r="4" fill="#ff9fb2"/>
+                        <line x1="30" y1="45" x2="50" y2="45"/>
+                        <line x1="30" y1="55" x2="50" y2="55"/>
+                        <path d="M35 25 Q40 20 45 25"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-content">
+                    <h3>Pattern Recognition</h3>
+                    <p>Our AI spots what you miss. Which products crush it. Which clients are money drains. Where opportunity lives hidden in your numbers.</p>
+                    <ul class="feature-list">
+                        <li>Trend detection</li>
+                        <li>Client profitability</li>
+                        <li>Opportunity alerts</li>
+                    </ul>
+                </div>
+                <div class="feature-visual">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#ffb3d9" stroke-width="2">
+                        <circle cx="40" cy="40" r="25"/>
+                        <circle cx="40" cy="40" r="18" fill="rgba(255,179,217,0.1)"/>
+                        <circle cx="40" cy="40" r="10"/>
+                        <line x1="40" y1="15" x2="40" y2="65"/>
+                        <line x1="15" y1="40" x2="65" y2="40"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-content">
+                    <h3>Action Plans</h3>
+                    <p>Not just data. Recommendations. What to do. Where to cut. How to grow. Backed by your actual numbers, not guesses.</p>
+                    <ul class="feature-list">
+                        <li>Growth strategies</li>
+                        <li>Cost optimization</li>
+                        <li>Revenue maximization</li>
+                    </ul>
+                </div>
+                <div class="feature-visual">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#c084fc" stroke-width="2">
+                        <path d="M20 60 L35 35 L50 45 L65 20" fill="none"/>
+                        <circle cx="20" cy="60" r="4" fill="#c084fc"/>
+                        <circle cx="35" cy="35" r="4" fill="#c084fc"/>
+                        <circle cx="50" cy="45" r="4" fill="#c084fc"/>
+                        <circle cx="65" cy="20" r="4" fill="#c084fc"/>
+                        <polygon points="65,20 70,15 75,25"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Who It's For -->
+    <section class="who-section">
+        <div class="who-header">
+            <h2>For Entrepreneurs Who Get It</h2>
+            <p>Built for people who don't have time to waste on accounting nonsense</p>
+        </div>
+        <div class="who-grid">
+            <div class="who-card">
+                <div class="who-emoji">
+                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="#ff9fb2" stroke-width="2">
+                        <path d="M15 20 Q25 15 35 20"/>
+                        <circle cx="20" cy="25" r="3" fill="#ff9fb2"/>
+                        <circle cx="30" cy="25" r="3" fill="#ff9fb2"/>
+                        <path d="M20 32 Q25 35 30 32"/>
+                        <rect x="10" y="38" width="30" height="8" rx="2"/>
+                    </svg>
+                </div>
+                <h3>Multi-Stream Hustlers</h3>
+                <p>Which income stream actually wins? Know in seconds. Multiple businesses? Multiple clarity. That's the game.</p>
+            </div>
+            <div class="who-card">
+                <div class="who-emoji">
+                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="#ffb3d9" stroke-width="2">
+                        <circle cx="25" cy="20" r="6"/>
+                        <path d="M19 28 Q25 30 31 28"/>
+                        <rect x="15" y="30" width="20" height="15" rx="2"/>
+                        <line x1="19" y1="30" x2="19" y2="45"/>
+                        <line x1="31" y1="30" x2="31" y2="45"/>
+                    </svg>
+                </div>
+                <h3>Freelance Builders</h3>
+                <p>Project profit? Client ROI? Project health? See it all. Stop wondering if that client is worth keeping.</p>
+            </div>
+            <div class="who-card">
+                <div class="who-emoji">
+                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="#c084fc" stroke-width="2">
+                        <path d="M25 10 L35 20 L30 25 L40 30 L25 35 L10 30 L20 25 L15 20 Z" fill="rgba(192,132,252,0.1)"/>
+                        <circle cx="25" cy="25" r="3" fill="#c084fc"/>
+                    </svg>
+                </div>
+                <h3>Business Pilots</h3>
+                <p>You need decisions fast. Real profit data. No meetings with accountants. No waiting. Just answers.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stats-header">
+            <h2>Trusted by Real Founders</h2>
+        </div>
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Profit Questions</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$2.3B</div>
+                <div class="stat-label">Revenue Analyzed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">97%</div>
+                <div class="stat-label">Recommend Us</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">15min</div>
+                <div class="stat-label">Setup Time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="final-cta-content">
+            <h2>Your Profit Awaits Discovery</h2>
+            <p>One setup. Lifetime clarity. See numbers others can't. Build faster. Decide smarter. Grow stronger.</p>
+            <button class="cta-primary"><a href="/onboard">Start Free Today</button>
+        </div>
+    </section>
+
+    <script>
+        // 3D Cat with scroll interaction
+        function initCat() {
+            const container = document.getElementById('cat-container');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+
+            camera.position.z = 3;
+
+            // Create cat body
+            const bodyGeometry = new THREE.BoxGeometry(1, 1.2, 0.8);
+            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xff9fb2 });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = -0.1;
+            scene.add(body);
+
+            // Create cat head
+            const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const headMaterial = new THREE.MeshPhongMaterial({ color: 0xff9fb2 });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 0.8;
+            scene.add(head);
+
+            // Create ears
+            const earGeometry = new THREE.ConeGeometry(0.25, 0.6, 32);
+            const earMaterial = new THREE.MeshPhongMaterial({ color: 0xffb3d9 });
+            
+            const leftEar = new THREE.Mesh(earGeometry, earMaterial);
+            leftEar.position.set(-0.35, 1.4, 0);
+            leftEar.rotation.z = 0.3;
+            scene.add(leftEar);
+
+            const rightEar = new THREE.Mesh(earGeometry, earMaterial);
+            rightEar.position.set(0.35, 1.4, 0);
+            rightEar.rotation.z = -0.3;
+            scene.add(rightEar);
+
+            // Create eyes
+            const eyeGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+            const eyeMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.18, 1, 0.35);
+            scene.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.18, 1, 0.35);
+            scene.add(rightEye);
+
+            // Create tail
+            const tailGeometry = new THREE.ConeGeometry(0.15, 1.2, 32);
+            const tailMaterial = new THREE.MeshPhongMaterial({ color: 0xffb3d9 });
+            const tail = new THREE.Mesh(tailGeometry, tailMaterial);
+            tail.position.set(0.5, -0.5, 0);
+            tail.rotation.z = 0.8;
+            scene.add(tail);
+
+            // Lighting
+            const light1 = new THREE.PointLight(0xff9fb2, 1, 100);
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+
+            const light2 = new THREE.PointLight(0xc084fc, 0.8, 100);
+            light2.position.set(-5, 5, 5);
+            scene.add(light2);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            // Scroll animation
+            let scrollProgress = 0;
+            window.addEventListener('scroll', () => {
+                const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                scrollProgress = window.scrollY / scrollHeight;
+            });
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Rotate cat based on scroll
+                body.rotation.y = scrollProgress * Math.PI * 2;
+                head.rotation.y = scrollProgress * Math.PI * 2;
+                
+                // Cat looks up when scrolling down
+                head.rotation.x = -scrollProgress * 0.5;
+                
+                // Tail moves
+                tail.rotation.z = 0.8 + Math.sin(Date.now() * 0.003 + scrollProgress * 5) * 0.3;
+
+                // Eyes follow scroll
+                const eyeRotation = scrollProgress * 0.3;
+                leftEye.position.x = -0.18 + eyeRotation;
+                rightEye.position.x = 0.18 + eyeRotation;
+
+                // Ears react
+                leftEar.rotation.z = 0.3 + scrollProgress * 0.3;
+                rightEar.rotation.z = -0.3 - scrollProgress * 0.3;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        // Generate random particles
+        function generateParticles() {
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 4 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 20 + 20;
+                const delay = Math.random() * 5;
+                
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                particle.style.background = `rgba(255, ${159 + Math.random() * 50}, ${178 + Math.random() * 40}, ${0.3 + Math.random() * 0.3})`;
+                particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+                
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Generate sparkle particles
+        function generateSparkles() {
+            const sparkleCount = 50;
+            for (let i = 0; i < sparkleCount; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                const size = Math.random() * 3 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 4 + 2;
+                const delay = Math.random() * 5;
+                
+                sparkle.style.width = size + 'px';
+                sparkle.style.height = size + 'px';
+                sparkle.style.left = x + '%';
+                sparkle.style.top = y + '%';
+                sparkle.style.animation = `twinkle ${duration}s ease-in-out ${delay}s infinite`;
+                
+                document.body.appendChild(sparkle);
+            }
+        }
+
+        // Add float animation to style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% {
+                    transform: translateY(0) translateX(0);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 1;
+                }
+                90% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize everything on load
+        window.addEventListener('load', () => {
+            initCat();
+            generateParticles();
+            generateSparkles();
+        });
+
+        // Smooth scroll functionality
+        function smoothScroll(target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

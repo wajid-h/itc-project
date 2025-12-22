@@ -4,103 +4,320 @@
 
 {% block extra_head %}
 <style>
-  /* minimal styles pulled from the original onboard page to keep layout consistent */
+  /* Pastel theme matching index.html */
   :root {
-    --bg: #f7f7f8;
-    --fg: #222;
-    --card: #fff;
-    --accent: #0078d4;
-    --border: #ddd;
-    --input-bg: #fff;
-    --input-fg: #222;
-  }
-  [data-theme="dark"] {
-    --bg: #121212;
-    --fg: #f5f5f5;
-    --card: #1e1e1e;
-    --accent: #0ea5e9;
-    --border: #333;
-    --input-bg: #2a2a2a;
-    --input-fg: #f5f5f5;
+    --bg: linear-gradient(135deg, #faf8f6 0%, #f5eef5 25%, #eef7fb 50%, #f0f5fa 75%, #faf6f8 100%);
+    --fg: #3a3a4a;
+    --card: rgba(255, 255, 255, 0.85);
+    --accent: #d9467f;
+    --accent-secondary: #a78bfa;
+    --border: rgba(217, 70, 127, 0.2);
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --input-fg: #3a3a4a;
+    --shadow-lg: 0 20px 60px rgba(217, 70, 127, 0.15);
   }
 
-  /* ensure the auth card is centered inside base main */
+  [data-theme="dark"] {
+    --bg: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+    --fg: #f5f5f5;
+    --card: rgba(30, 30, 46, 0.95);
+    --accent: #ff85c1;
+    --accent-secondary: #c084fc;
+    --border: rgba(200, 132, 252, 0.2);
+    --input-bg: rgba(42, 42, 60, 0.9);
+    --input-fg: #f5f5f5;
+    --shadow-lg: 0 20px 60px rgba(192, 132, 255, 0.1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    background-attachment: fixed;
+    color: var(--fg);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 192, 217, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(167, 139, 250, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 0%, rgba(96, 165, 250, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Auth card centered in viewport */
   .auth-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 25px;
     width: 100%;
-    max-width: 420px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    max-width: 450px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     margin: 2rem auto;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    z-index: 10;
   }
 
-  .tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:1rem; }
-  .tab { flex:1; text-align:center; padding:.5rem; cursor:pointer; }
-  .tab.active { color: var(--accent); border-bottom:2px solid var(--accent); }
+  .tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 2rem;
+    gap: 0;
+  }
 
-  /* ensure inputs and buttons align and fill the card width */
-  *, *::before, *::after { box-sizing: border-box; }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    color: var(--fg);
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .tab.active {
+    color: var(--accent);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
   input {
     width: 100%;
-    padding: .6rem .75rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
     background: var(--input-bg);
     color: var(--input-fg);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
   }
 
-  /* full-width primary buttons */
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(217, 70, 127, 0.1);
+    background: rgba(255, 255, 255, 1);
+  }
+
+  input::placeholder {
+    color: rgba(58, 58, 74, 0.5);
+  }
+
+  [data-theme="dark"] input::placeholder {
+    color: rgba(245, 245, 245, 0.4);
+  }
+
+  /* Primary button */
   .submit-btn {
     display: block;
     width: 100%;
-    padding: .65rem .75rem;
+    padding: 0.85rem 1.5rem;
     border: none;
-    border-radius: 6px;
-    background: var(--accent);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
     color: #fff;
     cursor: pointer;
     text-align: center;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 1.05rem;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 15px 40px rgba(217, 70, 127, 0.25), inset 0 -2px 8px rgba(217, 70, 127, 0.2);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
   }
 
-  /* full-width alternate (Google) button that follows theme */
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px rgba(217, 70, 127, 0.35), inset 0 -2px 12px rgba(217, 70, 127, 0.3);
+  }
+
+  .submit-btn:hover::before {
+    left: 100%;
+  }
+
+  /* Alternate button (Google) */
   .submit-btn.alt {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .6rem;
-    width: 100%;
-    padding: .6rem .75rem;
-    border-radius: 6px;
+    gap: 0.75rem;
     background: var(--input-bg);
-    color: var(--input-fg);
-    border: 1px solid var(--border);
+    color: var(--fg);
+    border: 2px solid var(--border);
+    box-shadow: 0 8px 20px rgba(217, 70, 127, 0.08);
   }
 
-  /* ensure lucide icon inside alt button sizes nicely */
-  .submit-btn.alt i[data-lucide] { width: 18px; height: 18px; }
+  .submit-btn.alt:hover {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(255, 192, 217, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+    box-shadow: 0 12px 30px rgba(217, 70, 127, 0.15);
+  }
 
-  /* centered "or" divider */
+  .submit-btn.alt i[data-lucide] {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Centered divider */
   .or-divider {
     text-align: center;
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-    color: var(--input-fg);
-    opacity: .85;
-    font-size: .95rem;
+    margin: 1.5rem 0;
+    color: var(--fg);
+    opacity: 0.6;
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
   }
 
-  /* keep spacing consistent */
-  form { display:flex; flex-direction:column; gap:.75rem; }
-  .input-group { display:flex; flex-direction:column; gap:.5rem; }
-  .input-row { display:flex; gap:.5rem; }
-  .input-row .field { flex:1; }
+  .or-divider::before,
+  .or-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: var(--border);
+  }
 
-  @media (max-width:480px) {
-    .input-row { flex-direction:column; }
+  .or-divider::before {
+    left: 0;
+  }
+
+  .or-divider::after {
+    right: 0;
+  }
+
+  /* Form layout */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .input-row .field {
+    flex: 1;
+  }
+
+  label {
+    font-weight: 600;
+    color: var(--fg);
+    font-size: 0.95rem;
+  }
+
+  /* Messages */
+  .p-error {
+    padding: 1rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 107, 107, 0.1) 100%);
+    color: #d9467f;
+    border: 1px solid rgba(217, 70, 127, 0.3);
+    margin-top: 1rem;
+    font-weight: 500;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .auth-card {
+      max-width: 100%;
+      padding: 2rem;
+      margin: 1rem;
+      border-radius: 20px;
+    }
+
+    .input-row {
+      flex-direction: column;
+    }
+
+    .tabs {
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      font-size: 1rem;
+      padding: 0.6rem;
+    }
+
+    input {
+      padding: 0.65rem 0.9rem;
+      font-size: 16px;
+    }
+
+    .submit-btn {
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+    }
   }
 </style>
 {% endblock %}
@@ -114,18 +331,18 @@
     <div class="tab" id="signupTab" role="tab" tabindex="0">Sign Up</div>
   </div>
 
-  <!-- Login form: grouped cleanly -->
+  <!-- Login form -->
   <form id="loginForm" method="post" action="{% url 'login' %}">
     {% csrf_token %}
     <input type="hidden" name="is_login" value="login">
     <div class="input-group">
-      <label for="login_email" class="sr-only" style="display:none">Email</label>
-      <input id="login_email" name="login_email" type="email" placeholder="Email" required>
+      <label for="login_email">Email</label>
+      <input id="login_email" name="login_email" type="email" placeholder="your@email.com" required>
     </div>
 
     <div class="input-group">
-      <label for="login_password" class="sr-only" style="display:none">Password</label>
-      <input id="login_password" name="login_password" type="password" placeholder="Password" required>
+      <label for="login_password">Password</label>
+      <input id="login_password" name="login_password" type="password" placeholder="••••••••" required>
     </div>
 
     <button type="submit" class="submit-btn">Login</button>
@@ -137,23 +354,30 @@
     </button>
   </form>
 
-  <!-- Signup form: grouped (full name + email) and (username + passwords) -->
+  <!-- Signup form -->
   <form id="signupForm" method="post" action="{% url 'login' %}" style="display:none;">
     {% csrf_token %}
     <input type="hidden" name="is_login" value="signup">
 
     <div class="input-group" aria-label="Name and email">
-      <input name="name" type="text" placeholder="Full Name" required>
-      <input name="email" type="email" placeholder="Email" required>
+      <label for="signup_name">Full Name</label>
+      <input id="signup_name" name="name" type="text" placeholder="John Doe" required>
+      <label for="signup_email" style="margin-top: 0.75rem;">Email</label>
+      <input id="signup_email" name="email" type="email" placeholder="your@email.com" required>
     </div>
 
     <div class="input-group" aria-label="Username and passwords">
+      <label for="signup_username">Username</label>
+      <input id="signup_username" name="username" type="text" placeholder="johndoe" required>
       <div class="input-row">
-        <div class="field"><input name="username" type="text" placeholder="Username" required></div>
-      </div>
-      <div class="input-row">
-        <div class="field"><input name="password" type="password" placeholder="Password" required></div>
-        <div class="field"><input name="conf_password" type="password" placeholder="Confirm Password" required></div>
+        <div class="field">
+          <label for="signup_password">Password</label>
+          <input id="signup_password" name="password" type="password" placeholder="••••••••" required>
+        </div>
+        <div class="field">
+          <label for="signup_conf_password">Confirm</label>
+          <input id="signup_conf_password" name="conf_password" type="password" placeholder="••••••••" required>
+        </div>
       </div>
     </div>
 
@@ -203,3 +427,4 @@
   signupTab.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showSignup(); } });
 </script>
 {% endblock %}
+

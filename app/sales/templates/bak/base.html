@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Sales Tracker{% endblock %}</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* =====================
+       THEME VARIABLES
+    ====================== */
+    :root {
+      --bg: #f6f7f9;
+      --fg: #1f2937;
+
+      --card-bg: #ffffff;
+      --card-shadow: 0 8px 20px rgba(0,0,0,.08);
+
+      --accent: #2563eb;
+      --border: #e5e7eb;
+
+      --input-bg: #ffffff;
+      --input-fg: #1f2937;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f1115;
+      --fg: #e5e7eb;
+
+      --card-bg: #161a22;
+      --card-shadow: 0 10px 25px rgba(0,0,0,.45);
+
+      --accent: #0ea5e9;
+      --border: #2a2f3a;
+
+      --input-bg: #1e2330;
+      --input-fg: #e5e7eb;
+    }
+
+    /* =====================
+       BASE RESET
+    ====================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background .3s, color .3s;
+    }
+
+    /* =====================
+       HEADER
+    ====================== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .theme-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+    }
+
+    .theme-btn:hover {
+      background: var(--border);
+    }
+
+    .user {
+      font-size: .9rem;
+      opacity: .85;
+    }
+
+    .auth-btn {
+      padding: .45rem .9rem;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .auth-btn:hover { opacity: .9; }
+
+    /* =====================
+       MAIN
+    ====================== */
+    main {
+      flex: 1;
+      padding: 1rem;
+    }
+
+    /* =====================
+       TABLE
+    ====================== */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 420px;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: .75rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      font-size: .85rem;
+      opacity: .8;
+    }
+
+    /* =====================
+       BUTTONS
+    ====================== */
+    .add-btn {
+      margin: 1rem 0;
+      padding: .55rem 1.1rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .add-btn:hover { opacity: .9; }
+
+    /* =====================
+       MODAL
+    ====================== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: .55rem;
+      margin: .5rem 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--input-fg);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: .6rem;
+      right: .6rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--fg);
+    }
+
+    /* =====================
+       BUSINESS CARDS
+    ====================== */
+    .cards-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .business-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .business-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: .35rem;
+    }
+
+    .business-card .desc {
+      font-size: .9rem;
+      opacity: .8;
+      margin-bottom: .9rem;
+    }
+
+    .business-card .meta {
+      font-size: .75rem;
+      opacity: .6;
+      margin-bottom: .8rem;
+    }
+
+    .card-btn {
+      text-decoration: none;
+      background: var(--accent);
+      color: white;
+      padding: .5rem;
+      border-radius: 10px;
+      text-align: center;
+      font-size: .85rem;
+    }
+
+    /* =====================
+       FOOTER
+    ====================== */
+    footer {
+      text-align: center;
+      padding: .75rem;
+      border-top: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: .8rem;
+      opacity: .7;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  <header>
+    <div class="logo">Sales Tracker</div>
+
+    <div class="nav-controls">
+      <button class="theme-btn" id="themeToggle">
+        <i data-lucide="moon"></i>
+      </button>
+
+      {% if user.is_authenticated %}
+        <div class="user">{{ user.username }}</div>
+        <form method="post" action="/logout">
+          {% csrf_token %}
+          <button class="auth-btn">Logout</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">
+          <button class="auth-btn">Login</button>
+        </a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    © {{ now|date:"Y" }} Sales Tracker
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    const themeBtn = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme) html.setAttribute('data-theme', savedTheme);
+
+    function updateIcon(theme) {
+      themeBtn.innerHTML = `<i data-lucide="${theme === 'dark' ? 'sun' : 'moon'}"></i>`;
+      lucide.createIcons();
+    }
+
+    updateIcon(html.getAttribute('data-theme') || 'light');
+
+    themeBtn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateIcon(next);
+    });
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
