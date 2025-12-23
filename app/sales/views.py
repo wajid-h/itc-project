@@ -74,7 +74,7 @@ def sales_report(request, id):
 
 def index(request):
     if request.user.is_authenticated == True:
-        return redirect("groups")
+        return redirect("index")
     return render(request, "index.html")
 
 def groups(request):
@@ -117,9 +117,9 @@ def index_business(request, id):
         sale = Sale.objects.create(
             business=business,
             date=date,
-            sale=sale,
-            expenses=expenses,
-            investment=investment
+            sale=int(sale),
+            expenses=int(expenses),
+            investment=int(investment)
         )
 
         sale.save();    

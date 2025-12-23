@@ -18,7 +18,7 @@ class Sale (models.Model):
     sale = models.BigIntegerField(blank=True, default=0)
     expenses = models.BigIntegerField(blank=True, default=0)
     investment =  models.BigIntegerField(blank = True, default= 0)
-    profit = models.BigIntegerField(blank=True, default=0)
+    profit = models.FloatField(blank=True, default=0)
     business = models.ForeignKey(SaleGroup, related_name= "sales", on_delete= models.CASCADE)
 
     def refresh_profit(self):
@@ -29,7 +29,8 @@ class Sale (models.Model):
         self.profit = computed
         self.save();
     
-    def save(self, *args, **kwargs):    
+    def save(self, *args, **kwargs):
+        print(f"Sale : {self.sale}  , Expenses: {self.expenses}")    
         computed = int(self.sale * PROFIT_MARGIN) - int(self.expenses)      
         self.profit = computed
         return super().save(*args, **kwargs)
