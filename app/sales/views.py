@@ -9,6 +9,7 @@ from django.db.models import Sum, Avg, Max, Min, Count
 from .models import SaleGroup, Sale
 from django.utils.dateparse import parse_date
 
+
 @login_required
 def sales_report(request, id):
     
@@ -39,7 +40,6 @@ def sales_report(request, id):
     )
 
     # Daily aggregation for charts
-    from django.db.models import F
     from django.db.models.functions import TruncDate
     
     daily_data = sales_qs.annotate(
@@ -59,7 +59,7 @@ def sales_report(request, id):
 
     context = {
         "business": business,
-        "summary": summary,
+        "summary": summary, 
         "start_date": start_date,
         "end_date": end_date,
         "chart_dates": dates,
